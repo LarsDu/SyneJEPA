@@ -1,0 +1,39 @@
+# SyneJEPA pretraining config for FMA Medium on Vertex AI (4x A100 40GB)
+
+data:
+  dataset: fma_medium
+  data_dir: /gcs/data/fma_medium
+  cache_dir: /gcs/data/cache
+  sample_rate: 16000
+  n_mels: 128
+  n_fft: 1024
+  hop_length: 160
+  window_sec: 4.0
+  patch_size: 16
+  mask_ratio_min: 0.4
+  mask_ratio_max: 0.6
+  view_shift_sec: 0.5
+  num_workers: 8
+
+model:
+  embed_dim: 384
+  depth: 12
+  num_heads: 6
+  patch_size: 16
+  proj_hidden_dim: 2048
+  proj_output_dim: 256
+  use_gradient_checkpointing: false
+
+training:
+  epochs: 200
+  batch_size: 32
+  gradient_accumulation_steps: 1
+  lr: 1e-4
+  weight_decay: 0.05
+  warmup_epochs: 10
+  lambda_sigreg: 1.0
+  num_slices: 512
+  checkpoint_dir: /gcs/checkpoints/fma_medium
+  log_dir: /gcs/tb_logs/fma_medium
+  checkpoint_every: 10
+  use_amp: true

@@ -1,0 +1,4 @@
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+gpu_type   = "NVIDIA_TESLA_A100"
+gpu_count  = 4
