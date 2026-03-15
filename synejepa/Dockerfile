@@ -1,12 +1,20 @@
-FROM nvcr.io/nvidia/pytorch:24.01-py3
+FROM python:3.14-slim
 
 WORKDIR /app
 
-COPY pyproject.toml .
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Copy dependency files first for layer caching
+COPY pyproject.toml uv.lock ./
+COPY README.md ./
+
+# Install dependencies
+RUN uv sync --frozen --no-dev
+
+# Copy source and configs
 COPY src/ src/
 COPY configs/ configs/
 COPY scripts/ scripts/
 
-RUN pip install --no-cache-dir -e ".[dev]"
-
-ENTRYPOINT ["python", "scripts/train.py"]
+ENTRYPOINT ["uv", "run", "python", "scripts/train.py"]
