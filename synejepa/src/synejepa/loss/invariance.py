@@ -1,26 +1,33 @@
-"""Invariance loss for dual-view SSL pretraining."""
+"""Invariance loss for multi-view SSL pretraining.
 
-import torch
-import torch.nn.functional as F
+Follows the leJEPA paper: MSE between each view's embeddings and the
+cross-view mean (centroid). No normalization is applied to embeddings.
+"""
+
+import torch.nn as nn
 from torch import Tensor
 
 
-class InvarianceLoss(torch.nn.Module):
-    """Cosine invariance loss between two embedding views.
+class InvarianceLoss(nn.Module):
+    """MSE-to-centroid invariance loss.
 
-    Encourages embeddings of augmented views of the same input to be similar.
+    For V views of B samples with D-dimensional embeddings stacked as (V, B, D),
+    computes the mean squared distance from each view to the cross-view centroid:
+
+        loss = mean((centroid - views)^2)
+
+    With 2 views this simplifies to 0.25 * ||z1 - z2||^2.
     """
 
-    def forward(self, z1: Tensor, z2: Tensor) -> Tensor:
+    def forward(self, z: Tensor) -> Tensor:
         """Compute invariance loss.
 
         Args:
-            z1: Embeddings from view 1, shape (B, D).
-            z2: Embeddings from view 2, shape (B, D).
+            z: Stacked view embeddings of shape (V, B, D) where V is number of
+               views, B is batch size, D is embedding dimension.
 
         Returns:
-            Scalar loss in [0, 2].
+            Scalar loss.
         """
-        z1 = F.normalize(z1, dim=-1)
-        z2 = F.normalize(z2, dim=-1)
-        return 2 - 2 * (z1 * z2).sum(dim=-1).mean()
+        centroid = z.mean(dim=0)  # (B, D)
+        return (centroid - z).square().mean()

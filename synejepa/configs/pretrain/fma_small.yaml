@@ -31,7 +31,7 @@ training:
   lr: 1e-4
   weight_decay: 0.05
   warmup_epochs: 10
-  lambda_sigreg: 1.0
+  lambda_sigreg: 0.5
   num_slices: 512
   checkpoint_dir: checkpoints/fma_small
   log_dir: tb_logs/fma_small

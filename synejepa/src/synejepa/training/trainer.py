@@ -28,7 +28,7 @@ class TrainingConfig:
     lr: float = 1e-4
     weight_decay: float = 0.05
     warmup_epochs: int = 10
-    lambda_sigreg: float = 1.0
+    lambda_sigreg: float = 0.5
     num_slices: int = 512
     checkpoint_dir: str = "checkpoints"
     log_dir: str = "tb_logs"
